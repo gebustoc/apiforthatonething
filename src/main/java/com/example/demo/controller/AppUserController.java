@@ -27,7 +27,6 @@ public class AppUserController {
 
     @PostMapping("/register")
     public ResponseEntity<AppUser> register(@RequestBody AppUser newUser){
-        newUser.setUserID(null); // quick hack to avoid crashing when trying to create an user from the app
         if (!userExists(newUser)){
             return ResponseEntity.status(201).body(service.registerUser(newUser));
         }

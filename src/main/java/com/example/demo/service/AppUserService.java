@@ -7,15 +7,13 @@ import com.example.demo.repository.AppUserRepository;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
 
 @Service
 public class AppUserService {
     
-    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    //private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     @Autowired
     private AppUserRepository appUserRepository;
 
@@ -23,7 +21,7 @@ public class AppUserService {
     public AppUser findByEmail(String email){return appUserRepository.findByEmail(email);}
     public AppUser findByUserID(Long userID){return appUserRepository.findByUserID(userID);}
     public AppUser registerUser(AppUser appUser){
-
+        appUser.setUserID(null);
         return appUserRepository.save(appUser);
     }
     
