@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,12 +23,12 @@ public class PostService {
     
 
     public List<Post> findByUserIDPaginated(Long userID, int page){
-        Pageable paige = PageRequest.of(page, 10,Sort.by("postID").ascending());
+        Pageable paige = PageRequest.of(page, 65536,Sort.by("postID").descending());
         return postRepository.findByUserID(userID,paige).getContent();
     }
 
     public List<Post> getPage(int page){
-        Pageable paige = PageRequest.of(page, 10,Sort.by("postID").ascending());
+        Pageable paige = PageRequest.of(page, 65536,Sort.by("postID").descending());
         return postRepository.findAll(paige).getContent();
     }
 
@@ -40,5 +41,6 @@ public class PostService {
         return posts;
     }
 
-
+    public int getUserPages(Long userID){return postRepository.getUserPages(userID);}
+    public int getOverallPages(){return postRepository.getOverallPages();}
 }

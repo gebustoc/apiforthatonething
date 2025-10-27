@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.AppUser;
 import com.example.demo.model.Post;
 import com.example.demo.service.AppUserService;
 import com.example.demo.service.PostService;
@@ -22,6 +23,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
 
 
 @CrossOrigin(origins = "*")
@@ -45,7 +47,7 @@ public class PostController {
 
     @GetMapping("page/{pageNumber}")
     public ResponseEntity<List<Post>> getPage(@PathVariable int pageNumber){
-        List<Post> paige = service.getPage(20*pageNumber);
+        List<Post> paige = service.getPage(0);
         if (paige.isEmpty()) return ResponseEntity.noContent().build();
         service.stripSensitiveInfo(paige, userService);        
         return ResponseEntity.ok(paige);
@@ -55,11 +57,24 @@ public class PostController {
     @GetMapping("user/{userID}")
     public ResponseEntity<List<Post>> findByUserIDPaginated(@PathVariable Long userID, @RequestParam int pageNumber){
 
-        List<Post> paige = service.findByUserIDPaginated(userID,20*pageNumber);
+        List<Post> paige = service.findByUserIDPaginated(userID,0);
         if (paige.isEmpty()) return ResponseEntity.noContent().build();
         service.stripSensitiveInfo(paige, userService);
         return ResponseEntity.ok(paige);
     }
+    @GetMapping("pagecount/{userID}")
+    public ResponseEntity<Integer> getUserPages(@PathVariable  Long userID){
+        return ResponseEntity.ok(service.getUserPages(userID));
+    }
+    @GetMapping("pagecount")
+    public ResponseEntity<Integer> getOverallPages(){
+        return ResponseEntity.ok(service.getOverallPages());
+    }
+
+
+    //public Long getOverallPages(){return postRepository.getOverallPages();}
+
+
 
     @PostMapping("/upload")
     public ResponseEntity<String> UploadPost(@RequestParam MultipartFile file, @RequestParam String postData) throws JsonMappingException, JsonProcessingException {
@@ -74,14 +89,20 @@ public class PostController {
         if (userService.login(post.getPostedBy()) == null)return ResponseEntity.badRequest().body("post has no user.");
         post.setPostID(null); // quick hack to avoid fuckery
 
+        if (post.getPostTitle().length() >= 32) return  ResponseEntity.badRequest().body("exceeds post title limits");
+        if (post.getPostDescription().length() >= 512) return  ResponseEntity.badRequest().body("exceeds description limits");
+
+
+
         try {
             post.setFileExtension("webp"); // still stores extension because backwards compatiblity oops
             post = service.savePost(post);
             saveImage(file,post.getPostID());
-            return ResponseEntity.ok("Post uploaded successfully");
+            return ResponseEntity.status(201).body("Post uploaded successfully");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image");
         }
+
     }
 
 
