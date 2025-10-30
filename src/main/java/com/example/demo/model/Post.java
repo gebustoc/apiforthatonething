@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Table(name="post_data")
 public class Post {
 
-
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long postID;
@@ -28,11 +27,10 @@ public class Post {
     private String postDescription;
 
     @ManyToOne
-    @JoinColumn(name = "userID", nullable = false)
+    @JoinColumn
     private AppUser postedBy;
 
-    @NotNull
-    @Column(length = 8)
+    @Column(length = 8,nullable = false)
     private String fileExtension;
     
 }
