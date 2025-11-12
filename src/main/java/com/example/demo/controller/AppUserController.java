@@ -37,7 +37,7 @@ public class AppUserController {
         if (newUser.getPasswordHash().length() >= 255) return  ResponseEntity.badRequest().body(new AppUser(null,null,null,"Exceeds Password Character limits"));
 
         Matcher matcher = pattern.matcher(newUser.getEmail());
-        if (matcher.matches()) return  ResponseEntity.badRequest().body(new AppUser(null,null,"Email is not valid",null));
+        if (!matcher.matches()) return  ResponseEntity.badRequest().body(new AppUser(null,null,"Email is not valid",null));
 
 
         if (!userExists(newUser)){
