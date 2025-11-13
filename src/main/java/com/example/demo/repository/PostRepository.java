@@ -19,7 +19,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT FLOOR(COUNT(postid)/10) FROM post_data where posted_by_userid = ?1 GROUP BY postid ORDER BY postid DESC",nativeQuery = true)
     public int getUserPages(Long userID);
 
-    @Query(value = "SELECT FLOOR(COUNT(postid)/10) FROM post_data ORDER BY postid DESC",nativeQuery = true)
+    @Query(value = "SELECT FLOOR(COUNT(postid)/10) FROM post_data GROUP BY postid ORDER BY postid DESC",nativeQuery = true)
     public int getOverallPages();
 
 
