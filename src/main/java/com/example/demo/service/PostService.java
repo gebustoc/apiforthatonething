@@ -1,17 +1,16 @@
 package com.example.demo.service;
 
 
-import com.example.demo.model.AppUser;
-import com.example.demo.model.Post;
-import com.example.demo.repository.PostRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.example.demo.model.Post;
+import com.example.demo.repository.PostRepository;
 
 
 @Service
@@ -23,12 +22,12 @@ public class PostService {
     
 
     public List<Post> findByUserIDPaginated(Long userID, int page){
-        Pageable paige = PageRequest.of(page, 65536,Sort.by("postID").descending());
+        Pageable paige = PageRequest.of(page, 2,Sort.by("postID").descending());
         return postRepository.findByUserID(userID,paige).getContent();
     }
 
     public List<Post> getPage(int page){
-        Pageable paige = PageRequest.of(page, 65536,Sort.by("postID").descending());
+        Pageable paige = PageRequest.of(page, 2,Sort.by("postID").descending());
         return postRepository.findAll(paige).getContent();
     }
 
@@ -41,6 +40,16 @@ public class PostService {
         return posts;
     }
 
-    public int getUserPages(Long userID){return postRepository.getUserPages(userID);}
-    public int getOverallPages(){return postRepository.getOverallPages();}
+    public int getUserPages(Long userID){
+        Integer paiges = postRepository.getUserPages(userID);
+        if (paiges == null){return 0;}
+        return paiges;
+
+
+    }
+    public int getOverallPages(){
+        Integer paiges = postRepository.getOverallPages();
+        if (paiges == null){return 0;}
+        return paiges;
+    }
 }

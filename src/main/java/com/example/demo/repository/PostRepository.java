@@ -16,11 +16,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT * FROM post_data where posted_by_userid = ?1 ORDER BY postid DESC",nativeQuery = true)
     public Page<Post> findByUserID(Long userID,Pageable pageable);
 
-    @Query(value = "SELECT FLOOR(COUNT(postid)/10) FROM post_data where posted_by_userid = ?1 GROUP BY postid ORDER BY postid DESC",nativeQuery = true)
-    public int getUserPages(Long userID);
+    @Query(value = "SELECT FLOOR(COUNT(postid)/2) FROM post_data where posted_by_userid = ?1 GROUP BY postid ORDER BY postid DESC",nativeQuery = true)
+    public Integer getUserPages(Long userID);
 
-    @Query(value = "SELECT FLOOR(COUNT(postid)/10) FROM post_data GROUP BY postid ORDER BY postid DESC",nativeQuery = true)
-    public int getOverallPages();
+    @Query(value = "SELECT FLOOR(COUNT(postid)/2) FROM post_data GROUP BY postid ORDER BY postid DESC",nativeQuery = true)
+    public Integer getOverallPages();
 
 
 }
