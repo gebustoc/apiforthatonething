@@ -62,7 +62,7 @@ public class PostController {
         service.stripSensitiveInfo(paige, userService);
         return ResponseEntity.ok(paige);
     }
-    @GetMapping("userpages/{userID}")
+    @GetMapping("pagecount/{userID}")
     public ResponseEntity<Integer> getUserPages(@PathVariable  Long userID){
         return ResponseEntity.ok(service.getUserPages(userID));
     }
