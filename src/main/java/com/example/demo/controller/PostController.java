@@ -47,7 +47,7 @@ public class PostController {
 
     @GetMapping("page/{pageNumber}")
     public ResponseEntity<List<Post>> getPage(@PathVariable int pageNumber){
-        List<Post> paige = service.getPage(0);
+        List<Post> paige = service.getPage(pageNumber);
         if (paige.isEmpty()) return ResponseEntity.noContent().build();
         service.stripSensitiveInfo(paige, userService);        
         return ResponseEntity.ok(paige);
@@ -57,12 +57,12 @@ public class PostController {
     @GetMapping("user/{userID}")
     public ResponseEntity<List<Post>> findByUserIDPaginated(@PathVariable Long userID, @RequestParam int pageNumber){
 
-        List<Post> paige = service.findByUserIDPaginated(userID,0);
+        List<Post> paige = service.findByUserIDPaginated(userID,pageNumber);
         if (paige.isEmpty()) return ResponseEntity.noContent().build();
         service.stripSensitiveInfo(paige, userService);
         return ResponseEntity.ok(paige);
     }
-    @GetMapping("pagecount/{userID}")
+    @GetMapping("userpages/{userID}")
     public ResponseEntity<Integer> getUserPages(@PathVariable  Long userID){
         return ResponseEntity.ok(service.getUserPages(userID));
     }
