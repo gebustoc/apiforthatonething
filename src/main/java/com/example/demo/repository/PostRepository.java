@@ -16,7 +16,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT * FROM post_data where posted_by_userid = ?1 ORDER BY postid DESC",nativeQuery = true)
     public Page<Post> findByUserID(Long userID,Pageable pageable);
 
-    @Query(value = "SELECT ROUND(COUNT(*)/2) FROM post_data where posted_by_userid = 4",nativeQuery = true)
+    @Query(value = "SELECT ROUND(COUNT(*)/2) FROM post_data where posted_by_userid = ?1",nativeQuery = true)
     public Integer getUserPages(Long userID);
 
     @Query(value = "SELECT ROUND(COUNT(*)/2) FROM post_data",nativeQuery = true)
