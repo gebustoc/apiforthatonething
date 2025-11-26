@@ -48,7 +48,7 @@ public class PostController {
     @GetMapping("page/{pageNumber}")
     public ResponseEntity<List<Post>> getPage(@PathVariable int pageNumber){
         List<Post> paige = service.getPage(pageNumber);
-        if (paige.isEmpty()) return ResponseEntity.noContent().build();
+        //if (paige.isEmpty()) return ResponseEntity.noContent().build();
         service.stripSensitiveInfo(paige, userService);        
         return ResponseEntity.ok(paige);
     }
@@ -58,7 +58,7 @@ public class PostController {
     public ResponseEntity<List<Post>> findByUserIDPaginated(@PathVariable Long userID, @RequestParam int pageNumber){
 
         List<Post> paige = service.findByUserIDPaginated(userID,pageNumber);
-        if (paige.isEmpty()) return ResponseEntity.noContent().build();
+        //if (paige.isEmpty()) return ResponseEntity.noContent();
         service.stripSensitiveInfo(paige, userService);
         return ResponseEntity.ok(paige);
     }
@@ -70,10 +70,6 @@ public class PostController {
     public ResponseEntity<Integer> getOverallPages(){
         return ResponseEntity.ok(service.getOverallPages());
     }
-
-
-    //public Long getOverallPages(){return postRepository.getOverallPages();}
-
 
 
     @PostMapping("/upload")
