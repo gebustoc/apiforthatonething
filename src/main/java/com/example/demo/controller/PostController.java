@@ -128,10 +128,14 @@ public class PostController {
                     return file.getOriginalFilename();
                 }
             };
+            
+
             body.add("image", imageRes);
+            
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.postForEntity(bbURL, requestEntity, String.class);
+            System.out.println(response.getBody());
             JSONObject responseData = new JSONObject(response.getBody());
             
             return responseData.getString("display_url");
