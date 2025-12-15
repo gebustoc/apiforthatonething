@@ -1,29 +1,36 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.AppUser;
+import java.io.IOException;
+import java.util.List;
+
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.demo.model.Post;
 import com.example.demo.service.AppUserService;
 import com.example.demo.service.PostService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*; // TODO:fix later
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
 
 
 @CrossOrigin(origins = "*")
@@ -53,7 +60,7 @@ public class PostController {
         return ResponseEntity.ok(paige);
     }
 
-    // TODO: fix this (i don't actually know how)
+
     @GetMapping("user/{userID}")
     public ResponseEntity<List<Post>> findByUserIDPaginated(@PathVariable Long userID, @RequestParam int pageNumber){
 
@@ -90,15 +97,12 @@ public class PostController {
 
 
 
-        try {
-            post.setFileExtension("webp"); // still stores extension because backwards compatiblity oops
-            post = service.savePost(post);
-            saveImage(file,post.getPostID());
-            return ResponseEntity.status(201).body("Post uploaded successfully");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image");
-        }
-
+        String bbID = saveImage(file);
+        if (bbID == null)return ResponseEntity.status(424).body("Could not upload to ImageBB");
+        post.setImageSource(bbID);
+        post = service.savePost(post);
+        return ResponseEntity.status(201).body("Post uploaded successfully");
+    
     }
 
 
@@ -108,13 +112,36 @@ public class PostController {
         return "";
     }
 
+    
+    private String saveImage(MultipartFile file) {
+        String bbURL = "https://api.imgbb.com/1/upload?key="+System.getenv("BB_KEY");
 
-    private String saveImage(MultipartFile file,Long postID) throws IOException {
-        Path uploadPath = Paths.get("images");
-        if (!Files.exists(uploadPath)) {Files.createDirectories(uploadPath);}
-        Path filePath = uploadPath.resolve(postID.toString()+"."+"webp");
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        return filePath.toString();
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);    
+            Resource imageRes = new ByteArrayResource(file.getBytes()) {
+                @Override
+                // This is crucial: the filename must be provided for proper multipart handling
+                public String getFilename() {
+                    return file.getOriginalFilename();
+                }
+            };
+            body.add("image", imageRes);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.postForEntity(bbURL, requestEntity, String.class);
+            JSONObject responseData = new JSONObject(response.getBody());
+            
+            return responseData.getString("display_url");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+
+       return null;
     }
 
 
