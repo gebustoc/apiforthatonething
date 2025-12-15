@@ -137,8 +137,9 @@ public class PostController {
             ResponseEntity<String> response = restTemplate.postForEntity(bbURL, requestEntity, String.class);
             System.out.println(response.getBody());
             JSONObject responseData = new JSONObject(response.getBody());
-            
-            return responseData.getString("display_url");
+        
+            return responseData.getJSONObject("data").getString("display_url");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
