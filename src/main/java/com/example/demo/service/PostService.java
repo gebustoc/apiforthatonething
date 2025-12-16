@@ -22,12 +22,12 @@ public class PostService {
     
 
     public List<Post> findByUserIDPaginated(Long userID, int page){
-        Pageable paige = PageRequest.of(page, 2,Sort.by("postID").descending());
+        Pageable paige = PageRequest.of(page, 10,Sort.by("postID").descending());
         return postRepository.findByUserID(userID,paige).getContent();
     }
 
     public List<Post> getPage(int page){
-        Pageable paige = PageRequest.of(page, 2,Sort.by("postID").descending());
+        Pageable paige = PageRequest.of(page, 10,Sort.by("postID").descending());
         return postRepository.findAll(paige).getContent();
     }
 
