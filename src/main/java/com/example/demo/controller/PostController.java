@@ -81,6 +81,7 @@ public class PostController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> UploadPost(@RequestParam MultipartFile file, @RequestParam String postData) throws JsonMappingException, JsonProcessingException {
+        System.out.println(postData);
         Post post;
         ObjectMapper objectMapper = new ObjectMapper();
         try{
